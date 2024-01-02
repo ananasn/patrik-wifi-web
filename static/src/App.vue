@@ -55,24 +55,25 @@ export default {
     this.loadSSID();
   },
   methods: {
-    connect: function(ssid, password) {
+    connect(ssid, password) {
       axios.post("http://localhost:8888/connect/", { 
         ssid: ssid, 
         password: password
       })
       .then(response => {
-        this.message = response.data.ssid
-        console.log(response)
+        this.message = response.data.message 
+        console.log(response.data)
       })
       .catch(error => {
         console.log(error)
       })
     },
-    loadSSID: function() {
+    loadSSID() {
+      this.message = "Обновляется список сетей, подождите..."
       axios.get("http://localhost:8888/ssid/")
       .then(response => {
         this.options = response.data
-        console.log(response.data)
+        this.message = ""
       })
       .catch(error => {
         console.error(error)

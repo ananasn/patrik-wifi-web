@@ -1,3 +1,5 @@
+import webbrowser
+
 from subprocess import Popen, PIPE
 from uuid import UUID, uuid4
 
@@ -35,37 +37,47 @@ class Credintals(BaseModel):
 
 @app.post("/connect/")
 async def connect(credintals: Credintals):
-    print(credintals.password, credintals.ssid)
-    return credintals
+    nmcli = Popen([
+            f"nmcli",
+            f"dev",
+            f"wifi",
+            f"connect",
+            f"{credintals.ssid}",
+            f"password",
+            f"{credintals.password}"
+        ], 
+        stderr=PIPE,
+        stdout=PIPE
+    )
+    answer, err = nmcli.communicate()
+    if err and err.split()[0] == b"Error:":
+        return {
+            "message": f"Не удалось подключиться к сети {credintals.ssid}"
+        }
+    webbrowser.open_new_tab("ya.ru")
+    return {
+        "message": f"Подключено к сети {credintals.ssid}"}
 
 
 @app.get("/ssid/")
 async def scan_ssid() -> list[SSID]:
-    iwlist_raw = Popen(["iwlist", "scan"], stdout=PIPE)
-    ap_list, err = iwlist_raw.communicate()
+    iwlist_raw = Popen(
+        ["nmcli -t -f active,ssid dev wifi"],
+        shell=True,
+        stdout=PIPE
+    )
+    ap_list, _ = iwlist_raw.communicate()
     ap_array = []
 
     for line in ap_list.decode("utf-8").rsplit("\n"):
-        iwlist_raw = Popen(["nmcli", "dev", "wifi"], stdout=PIPE)
-        ap_list, _ = iwlist_raw.communicate()
-        ap_array = []
-
-        for line in ap_list.decode("utf-8").rsplit("\n")[1:]:  # Skip table title.
-            # Skip leading asteriks (*) -- current network mark, get SSID
-            if line:
-                ap_ssid = line[1:].split()[1]
-                if ap_ssid not in ("", "--"):
-                    ap_array.append(SSID(text=ap_ssid))
-
+        try:
+            _, ap_ssid = line.split(":")
+            if ap_ssid:
+                ap_array.append(SSID(text=ap_ssid))
+        except ValueError:
+            continue
+    
     return ap_array
 
 
 app.mount("/", StaticFiles(directory="static/dist", html=True))
-
-
-if __name__ == "__main__":
-    nmcli = Popen(["nmcli", "dev", "wifi", "connect", "catnet", "password", "123456789"], stdout=PIPE)
-    answer, err = nmcli.communicate()
-    if answer.startswith("Error"):
-        print("NYA")
-    print(answer, err)
