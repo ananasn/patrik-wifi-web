@@ -1,9 +1,12 @@
+import os
 import sys
 import asyncio
+import logging
 # import webbrowser
 
-from subprocess import Popen, PIPE
 from uuid import UUID, uuid4
+from logging.handlers import RotatingFileHandler
+from subprocess import Popen, PIPE
 
 from hypercorn.asyncio import serve
 from hypercorn.config import Config
@@ -29,6 +32,23 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+)
+
+if not os.path.exists("logs"):
+    os.makedirs("logs")
+
+log_file = RotatingFileHandler(
+    'logs/connect_wifi.log',
+    maxBytes=32768, 
+    backupCount=16
+)
+log_console = logging.StreamHandler()
+
+logging.basicConfig(
+    handlers=(log_file, log_console), 
+    format='[%(asctime)s | %(levelname)s]: %(message)s', 
+    datefmt='%m.%d.%Y %H:%M:%S',
+    level=logging.INFO
 )
 
 
@@ -58,18 +78,24 @@ async def connect(credintals: Credintals):
     )
     answer, err = nmcli.communicate()
     if err and err.split()[0] == b"Error:":
-        return {
-            "message": f"Не удалось подключиться к сети {credintals.ssid}"
-        }
+        msg = f"Не удалось подключиться к сети {credintals.ssid}"
+
+        if answer:
+            logging.info(answer)
+        logging.error(msg)
+        logging.error(err)
+
+        return {"message": msg}
     
     url = sys.argv[1]
     if url:
+        logging.info(f"Openning url: {url}")
         # webbrowser.get(using='chromium-browser').open_new_tab(url)
         Popen(
             [f"sh start-browser.sh {url}"],
             shell=True,
             stdout=PIPE
-    )
+        )
         exit(0)
     exit(0)
 
@@ -81,8 +107,11 @@ async def scan_ssid() -> list[SSID]:
         shell=True,
         stdout=PIPE
     )
-    ap_list, _ = iwlist_raw.communicate()
+    ap_list, err = iwlist_raw.communicate()
     ap_array = []
+
+    if err:
+        logging.error(err)
 
     for line in ap_list.decode("utf-8").rsplit("\n"):
         try:
