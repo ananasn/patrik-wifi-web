@@ -13,7 +13,7 @@ MAIN_URL="http://ya.ru"  # CHANGE ME PLEASE!!!
 WIFI_URL="http://localhost:8888"
 
 # Check if wifi connection is established
-WIFI_CONNECTED=`nmcli -t -f active,ssid dev wifi | egrep '^yes' | cut -d\' -f2)`
+WIFI_CONNECTED=`nmcli -t -f active,ssid dev wifi | egrep '^yes' | cut -d\' -f2`
 
 if test -z "$WIFI_CONNECTED"; then
     python3 connect_wifi.py $MAIN_URL > /dev/null 2>&1 &
