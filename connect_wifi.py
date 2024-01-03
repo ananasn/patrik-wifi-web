@@ -34,6 +34,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+abspath = os.path.abspath(__file__)
+dname = os.path.dirname(abspath)
+os.chdir(dname)
+
 if not os.path.exists("logs"):
     os.makedirs("logs")
 

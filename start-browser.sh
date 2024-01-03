@@ -1,5 +1,6 @@
 #!/bin/bash
 
+export DISPALY=:0
 # chromium-browser \
 #     --noerrdialogs \
 #     --disable-infobars \ 
