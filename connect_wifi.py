@@ -1,8 +1,12 @@
-import webbrowser
+import sys
+import asyncio
+# import webbrowser
 
 from subprocess import Popen, PIPE
 from uuid import UUID, uuid4
 
+from hypercorn.asyncio import serve
+from hypercorn.config import Config
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,6 +14,9 @@ from pydantic import BaseModel, Field
 
  
 app = FastAPI()
+
+config = Config()
+config.bind = ["localhost:8888"]
 
 origins = [
     "http://localhost",
@@ -54,9 +61,17 @@ async def connect(credintals: Credintals):
         return {
             "message": f"Не удалось подключиться к сети {credintals.ssid}"
         }
-    webbrowser.open_new_tab("ya.ru")
-    return {
-        "message": f"Подключено к сети {credintals.ssid}"}
+    
+    url = sys.argv[1]
+    if url:
+        # webbrowser.get(using='chromium-browser').open_new_tab(url)
+        Popen(
+            [f"sh start-browser.sh {url}"],
+            shell=True,
+            stdout=PIPE
+    )
+        exit(0)
+    exit(0)
 
 
 @app.get("/ssid/")
@@ -80,4 +95,8 @@ async def scan_ssid() -> list[SSID]:
     return ap_array
 
 
-app.mount("/", StaticFiles(directory="static/dist", html=True))
+if __name__ == "__main__":
+    # Serve static files
+    app.mount("/", StaticFiles(directory="static/dist", html=True))
+    # Run main application
+    asyncio.run(serve(app, config))
