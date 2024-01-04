@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    
+
     <div class="flex-container">
       <select v-model="ssid" class="custom-select">
         <option value="" disabled selected hidden>Выберите сеть</option>

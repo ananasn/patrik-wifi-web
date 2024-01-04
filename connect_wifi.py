@@ -107,7 +107,7 @@ async def connect(credintals: Credintals):
         logging.info(f"Openning url: {url}")
         # webbrowser.get(using='chromium-browser').open_new_tab(url)
         Popen(
-            [f"sh start-browser.sh {url}"],
+            [f"sh ./start-browser.sh {url}"],
             shell=True,
             stdout=PIPE
         )

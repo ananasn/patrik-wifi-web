@@ -18,7 +18,7 @@ WIFI_CONNECTED=`nmcli -t -f active,ssid dev wifi | egrep '^yes' | cut -d\' -f2`
 cd /home/$USER/wifi-web
 
 if test -z "$WIFI_CONNECTED"; then
-    python3 ./connect_wifi.py $MAIN_URL
+    python3 ./connect_wifi.py $MAIN_URL &
     sleep 2
     sh ./start-browser.sh $WIFI_URL
 else

@@ -1,5 +1,6 @@
 #app {
   font-family: "Avenir", Helvetica, Arial, sans-serif;
+  margin-top: 10em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
