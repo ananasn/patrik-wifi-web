@@ -25,7 +25,11 @@
         placeholder="Введите пароль от Wi-Fi сети"
       >
 
-      <button class="slave-flex" type="password" @click="switchVisibility">Показать пароль</button>
+      <button 
+        class="slave-flex" 
+        type="password" @click="switchVisibility">
+          Показать пароль
+      </button>
     </div>
 
     <SimpleKeyboard 
@@ -92,7 +96,7 @@ export default {
       if (button === "{enter}"){
         if (this.ssid && this.input) {
           this.connect(this.ssid, this.input)
-          this.message = ""
+          this.message = "Подключение..."
         } else {
           this.message = "Не выбрана сеть и/или не введён пароль"
         }

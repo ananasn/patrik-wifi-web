@@ -1,7 +1,15 @@
-Установка зависимостей:
+Установка зависимостей
 
 ```
 pip install --no-cache-dir -r requirements.txt
+```
+
+Установка браузера
+
+```
+sudo add-apt-repository ppa:xtradeb/apps -y
+sudo apt update
+sudo apt install chromium
 ```
 
 Настройка сервиса sysyemd
