@@ -36,4 +36,6 @@ sudo systemctl stop patrik.service
 
 Журнал ошибок
 
+```
 journalctl -xeu patrik.service
+```
