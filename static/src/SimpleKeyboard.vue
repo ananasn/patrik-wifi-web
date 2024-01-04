@@ -31,7 +31,7 @@ export default {
         "{lock}": "⇪",
         "{shift}": "Shift",
         "{bksp}": "⌫",
-        "{enter}": "Connect",
+        "{enter}": "Подключиться",
       },
       layout: {
         "default": [

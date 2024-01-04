@@ -6,7 +6,7 @@ import logging
 
 from uuid import UUID, uuid4
 from logging.handlers import RotatingFileHandler
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, TimeoutExpired
 
 from hypercorn.asyncio import serve
 from hypercorn.config import Config
@@ -14,6 +14,9 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+
+
+CONNECTION_TIMEOUT = 5
 
  
 app = FastAPI()
@@ -80,16 +83,24 @@ async def connect(credintals: Credintals):
         stderr=PIPE,
         stdout=PIPE
     )
-    answer, err = nmcli.communicate()
-    if err and err.split()[0] == b"Error:":
-        msg = f"Не удалось подключиться к сети {credintals.ssid}"
 
+    err_msg = f"Не удалось подключиться к сети {credintals.ssid}"
+    
+    try:
+        answer, err = nmcli.communicate(timeout=CONNECTION_TIMEOUT)
+    except TimeoutExpired:
+        nmcli.kill()
+        logging.error(err_msg)
+
+        return {"message": err_msg}
+
+    if err and err.split()[0] == b"Error:":
         if answer:
             logging.info(answer)
-        logging.error(msg)
+        logging.error(err_msg)
         logging.error(err)
 
-        return {"message": msg}
+        return {"message": err_msg}
     
     url = sys.argv[1]
     if url:

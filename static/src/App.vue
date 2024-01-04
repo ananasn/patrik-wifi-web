@@ -13,16 +13,21 @@
         </option>
       </select>
 
-      <button @click="loadSSID">⟳</button>
+      <button @click="loadSSID">Обновить</button>
     </div>
 
-    <input
-      :value="input"
-      class="input"
-      @input="onInputChange"
-      type="password"
-      placeholder="Введите пароль от Wi-Fi сети"
-    >
+    <div class="flex-container">
+      <input
+        :value="input"
+        class="input master-flex"
+        @input="onInputChange"
+        :type="passwordFieldType"
+        placeholder="Введите пароль от Wi-Fi сети"
+      >
+
+      <button class="slave-flex" type="password" @click="switchVisibility">Показать пароль</button>
+    </div>
+
     <SimpleKeyboard 
       @onChange="onChange" 
       @onKeyPress="onKeyPress" 
@@ -48,7 +53,8 @@ export default {
     input: "",
     ssid: "",
     message: "",
-    options: []
+    options: [],
+    passwordFieldType: "password"
 
   }),
   mounted: function() {
@@ -94,6 +100,9 @@ export default {
     },
     onInputChange(input) {
       this.input = input.target.value
+    },
+    switchVisibility() {
+      this.passwordFieldType = this.passwordFieldType === "password" ? "text" : "password";
     }
   }
 };

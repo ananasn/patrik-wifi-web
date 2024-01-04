@@ -12,10 +12,19 @@
   font-size: 1.4rem;
 }
 
+label {
+  padding: 0.675em 0em 0.675em 1em;
+  font-size: 1.15rem;
+}
+
+[type=checkbox] {
+  padding: 0;
+}
+
 input {
-  width: 100%;
+  /* width: 100%; */
   /* height: 100px; */
-  padding: 0.675em 6em 0.675em 1em;
+  padding: 0.675em 1em 0.675em 1em;
   font-size: 1.15rem;
   border: 1px solid #caced1;
   box-sizing: border-box;
@@ -23,7 +32,7 @@ input {
 
 button {
   padding: 0.4em;
-  font-size: 1.5rem;
+  font-size: 1.15rem;
   background: #007AFF;
   color: white;
   border: 1px solid #caced1;
@@ -32,6 +41,15 @@ button {
 
 .flex-container {
   display: flex;
+  justify-content: space-between
+}
+
+.master-flex {
+  flex-grow: 20; /* default 0 */
+}
+
+.slave-flex {
+  flex-grow: 1; /* default 0 */
 }
 
 .custom-select {
