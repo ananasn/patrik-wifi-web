@@ -39,7 +39,9 @@ button {
 
 .flex-container {
   display: flex;
-  justify-content: space-between
+  justify-content: space-between;
+  padding: 5px;
+  background-color: #ececec;
 }
 
 .master-flex {
@@ -76,4 +78,12 @@ select {
 .simple-keyboard.hg-layout-default .hg-button.hg-highlight {
   background: #007AFF;
   color: white;
+}
+
+.hg-theme-default {
+  border-radius: 0;
+}
+
+.hg-theme-default .hg-button {
+  border-radius: 0;
 }
