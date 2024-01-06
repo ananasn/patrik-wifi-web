@@ -1,10 +1,13 @@
 import os
 import sys
+import time
 import asyncio
 import logging
+import requests
 # import webbrowser
 
 from uuid import UUID, uuid4
+from random import randint
 from logging.handlers import RotatingFileHandler
 from subprocess import Popen, PIPE, TimeoutExpired
 
@@ -16,7 +19,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 
+SPEECH_SERVER_URL = "http://localhost:8006/say"
+WIFI_ADAPTER_NAME = "wlp0s20f3"
+AP_NAME = "patrik"
+AP_SSID = f"{AP_NAME}-{randint(99, 999)}"
+AP_PASSWORD = "12345678"
 CONNECTION_TIMEOUT = 5
+NMCLI_TIMEOUT = 0.1
+WAIT_ADDRESS_TIMEOUT = 2
 
  
 app = FastAPI()
@@ -67,6 +77,71 @@ class SSID(BaseModel):
 class Credintals(BaseModel):
     ssid: str
     password: str
+
+
+def create_ap():
+    cmds = [
+        f"nmcli con delete {AP_NAME}",
+        f"nmcli con add type wifi ifname {WIFI_ADAPTER_NAME} con-name {AP_NAME} autoconnect yes ssid {AP_SSID}",
+        f"nmcli con mod {AP_NAME} 802-11-wireless.mode ap 802-11-wireless.band bg ipv4.method shared",
+        f"nmcli con mod {AP_NAME} wifi-sec.key-mgmt wpa-psk",
+        f"nmcli con mod {AP_NAME} wifi-sec.psk {AP_PASSWORD}"
+    ]
+
+    for cmd in cmds:
+        Popen(cmd, shell=True)
+        time.sleep(NMCLI_TIMEOUT)
+
+
+def turn_on_ap():
+    Popen(f"nmcli con up {AP_NAME}", shell=True)
+
+
+def is_ap_exists():
+    con_list_raw = Popen(
+        ["nmcli -t -f NAME con"],
+        shell=True,
+        stdout=PIPE
+    )
+    con_list, err = con_list_raw.communicate()
+
+    if err:
+        logging.error(err)
+
+    for con_name in con_list.decode("utf-8").rsplit("\n"):
+        if con_name == AP_NAME:
+            return True
+    
+    return False
+
+
+def get_ip_address():
+    connectio_info_raw = Popen(
+        [f"nmcli -t con show {AP_NAME} | grep IP4.ADDRESS"],
+        shell=True,
+        stdout=PIPE
+    )
+    ip_addr_raw, err = connectio_info_raw.communicate()
+
+    if err:
+        logging.error(err)
+
+    ip_addr = ip_addr_raw.decode("utf-8").split(":")[1].split("/")[0].split(".")
+    return ". ". join(ip_addr)
+
+
+def say_connect_params():
+    time.sleep(WAIT_ADDRESS_TIMEOUT)
+
+    phrase = (
+        f"Имя моей Wi-Fi сети {AP_SSID}, пароль {'. '.join(AP_PASSWORD)}. "
+        f"Мой статический IP адрес {get_ip_address()}"
+    )
+    try:
+        r = requests.post(SPEECH_SERVER_URL, json={"phrase": phrase})
+        print(r)
+    except requests.exceptions.ConnectionError:
+        logging.error(f"No connection to speech server {SPEECH_SERVER_URL}")
 
 
 @app.post("/connect/")
@@ -140,6 +215,11 @@ async def scan_ssid() -> list[SSID]:
 
 
 if __name__ == "__main__":
+    # if not is_ap_exists():
+    create_ap()
+    turn_on_ap()
+    say_connect_params()
+    
     # Serve static files
     app.mount("/", StaticFiles(directory="static/dist", html=True))
     # Run main application
