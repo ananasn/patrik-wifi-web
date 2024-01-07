@@ -1,0 +1,28 @@
+---
+fastapi_server:
+    url: localhost:8888
+    origins:
+        - "http://127.0.0.1"
+        - "http://127.0.0.1:8888"
+        - "http://localhost"
+        - "http://localhost:8080"
+    static_dir: "static/dist"
+speech_server:
+    url: "http://localhost:8006/say"
+    wait_address_timeout: 5
+hotspot:
+    adapter_name: wlp0s20f3
+    connection_name: patrik
+    password: "12345678"
+nmcli:
+    connection_timeout: 5
+    exec_timeout: 0.1
+logging:
+    log_dir: logs
+    log_file: connect_wifi.log
+    max_bytes: 32768
+    backup_count: 16
+    log_level: INFO
+    log_format: "[%(asctime)s | %(levelname)s]: %(message)s"
+    date_format: "%m.%d.%Y %H:%M:%S"
+...
