@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title></title>
+      <style>
+          h1 {
+            text-align: center;
+            margin-bottom: 10em;
+          }
+          .ring {
+            border: 20px solid rgb(211, 211, 211);
+            position: absolute;
+            left: 45%;
+            border-radius: 50%;
+            border-top: 20px solid #eb4335; /* red */
+            border-bottom: 20px solid #4285f4; /* blue */
+            border-right: 20px solid #fbbc05; /* yellow */
+            border-left:20px solid #34a853; /* green */
+            width: 120px;
+            height: 120px;
+            animation: spin 1s linear infinite;
+          }
+          @keyframes spin {
+            0% {
+              transform: rotate(0deg);
+            }
+            100% {
+              transform: rotate(360deg);
+            }
+          }
+      </style>
+   </head>
+   <body>
+      <h1>Пожалуйста, подождите загрузки...</h1>
+      <div class="ring"> </div>
+   </body>
+</html>

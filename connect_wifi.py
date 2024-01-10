@@ -96,7 +96,7 @@ def scan_ssid():
     for line in ap_list.decode("utf-8").rsplit("\n"):
         try:
             _, ap_ssid = line.split(":")
-            if ap_ssid:
+            if ap_ssid and not ap_ssid.startswith(AP_NAME):
                 ap_array.append(SSID(text=ap_ssid))
         except ValueError:
             continue
@@ -114,7 +114,7 @@ def scan_ssid():
 
 def create_ap():
     cmds = [
-        f"nmcli con delete {AP_NAME}",
+        f"nmcli con down {AP_NAME}",
         f"nmcli con add type wifi ifname {AP_ADAPTER_NAME} con-name {AP_NAME} autoconnect yes ssid {AP_SSID}",
         f"nmcli con mod {AP_NAME} 802-11-wireless.mode ap 802-11-wireless.band bg ipv4.method shared",
         f"nmcli con mod {AP_NAME} wifi-sec.key-mgmt wpa-psk",
