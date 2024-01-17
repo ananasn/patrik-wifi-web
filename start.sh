@@ -9,13 +9,13 @@
 # xset s reset     # Force screen on
 # xset s 0         # Disable blanking until next boot
 
-MAIN_URL="http://ya.ru"  # CHANGE ME PLEASE!!!
+MAIN_URL="http://localhost:8001"  # CHANGE ME PLEASE!!!
 WIFI_URL="http://localhost:8888"
 
 # Check if wifi connection is established
 WIFI_CONNECTED=`nmcli -t -f active,ssid dev wifi | egrep '^yes' | cut -d\' -f2`
 
-cd /home/$USER/wifi-web
+cd /home/$USER/patrik/wifi-web
 
 if test -z "$WIFI_CONNECTED"; then
     python3 ./connect_wifi.py $MAIN_URL &
