@@ -9,8 +9,8 @@
 # xset s reset     # Force screen on
 # xset s 0         # Disable blanking until next boot
 
-MAIN_URL="http://localhost:8001"  # CHANGE ME PLEASE!!!
-WIFI_URL="http://localhost:8888"
+MAIN_URL="http://localhost:8001"  # CHANGE ME PLEASE!!! Mimic port
+WIFI_URL="http://localhost:8889"
 
 # Check if wifi connection is established
 WIFI_CONNECTED=`nmcli -t -f active,ssid dev wifi | egrep '^yes' | cut -d\' -f2`
@@ -23,7 +23,9 @@ if test -z "$WIFI_CONNECTED"; then
     sh ./start-browser.sh $WIFI_URL
 else
     echo Opening main interface
+    python3 ./connect_wifi.py $MAIN_URL &
     sh ./start-browser.sh $MAIN_URL
+
 
     # sleep 30         # Allow time for booting and starting browser. Adjust as necessary
     # xset s reset     # Force screen on

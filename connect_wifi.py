@@ -22,11 +22,14 @@ CONNECTION_TIMEOUT = 5
 app = FastAPI()
 
 config = Config()
-config.bind = ["localhost:8888"]
+config.bind = ["0.0.0.0:8889"]
 
 origins = [
     "http://localhost",
     "http://localhost:8080",
+    "http://localhost:8889",
+    "http://127.0.0.1:8889",
+    "*"
 ]
 
 app.add_middleware(
@@ -111,8 +114,8 @@ async def connect(credintals: Credintals):
             shell=True,
             stdout=PIPE
         )
-        exit(0)
-    exit(0)
+    #     exit(0)
+    # exit(0)
 
 
 @app.get("/ssid/")
